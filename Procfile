@@ -1,1 +1,1 @@
-web: python3 safety_bot.py
+worker: python3 safety_bot.py
