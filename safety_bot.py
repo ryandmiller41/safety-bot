@@ -3,6 +3,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from flask import Flask
 
 # Load environment variables from a .env file (for local development)
 load_dotenv()
@@ -29,4 +30,18 @@ def handle_safety_command(ack, respond):
     except ValueError:
         respond("⚠️ Invalid date format in `incident_date.txt`. Use YYYY-MM-DD.")
     except Exception as e:
-        respond
+        respond(f"❌ Unexpected error: {str(e)}")
+
+# Flask app to handle web requests (necessary for Heroku)
+flask_app = Flask(__name__)
+
+@flask_app.route("/")
+def index():
+    return "Safety Bot is running!"
+
+# This will ensure the app binds to the correct port on Heroku
+if __name__ == "__main__":
+    print("⚡️ Starting app with Socket Mode...")
+    handler = SocketModeHandler(app, os.getenv("SLACK_APP_TOKEN"))
+    # Start the Flask server on the Heroku-assigned port
+    flask_app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
