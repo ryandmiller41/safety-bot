@@ -18,5 +18,8 @@ def slack_events():
     # Otherwise, pass to Slack Bolt handler
     return handler.handle(request)
 
+# Define the app object for Gunicorn
+app = flask_app
+
 if __name__ == "__main__":
     flask_app.run(port=int(os.environ.get("PORT", 3000)))
