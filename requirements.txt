@@ -1,3 +1,4 @@
-python-dotenv==1.1.0
-slack_bolt==1.23.0
-slack_sdk==3.35.0
+slack-bolt==1.14.0
+python-dotenv==0.21.0  # Optional for local development to load environment variables from a .env file
+gunicorn==20.1.0       # Recommended for production to run a WSGI server
+
