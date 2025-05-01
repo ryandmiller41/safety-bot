@@ -1,28 +1,22 @@
+from flask import Flask, request, make_response
 import os
-from flask import Flask, request
+import json
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
 
-# Initialize the Slack Bolt App
-bolt_app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
-
-# Create the Flask server
 flask_app = Flask(__name__)
+bolt_app = App(token=os.getenv("SLACK_BOT_TOKEN"))
 handler = SlackRequestHandler(bolt_app)
 
-# Slack Events endpoint
 @flask_app.route("/slack/events", methods=["POST"])
 def slack_events():
+    # Handle Slack's URL verification challenge
+    if request.headers.get("Content-Type") == "application/json":
+        data = request.get_json()
+        if "challenge" in data:
+            return make_response(data["challenge"], 200, {"content_type": "text/plain"})
+    # Otherwise, pass to Slack Bolt handler
     return handler.handle(request)
 
-# Optional: a simple homepage
-@flask_app.route("/", methods=["GET"])
-def home():
-    return "Slack bot is running on Heroku!"
-
-# Entry point for local or Heroku
 if __name__ == "__main__":
-    flask_app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
+    flask_app.run(port=int(os.environ.get("PORT", 3000)))
